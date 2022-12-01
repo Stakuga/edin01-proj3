@@ -50,12 +50,7 @@ def findInitialL1():
             largestDistance = abs(p - 0.5)
             bestInitialState = i
 
-    print(largestDistance)
     return(bestInitialState)
-
-#p = findInitialL1()
-#print(p)
-
 
 # Register L2:
 
@@ -98,11 +93,7 @@ def findInitialL2():
             largestDistance = abs(p - 0.5)
             bestInitialState = i
 
-    print(largestDistance)
     return(bestInitialState)
-
-#l2 = findInitialL2()
-#print(l2)
 
 # Register L3:
 
@@ -147,16 +138,24 @@ def findInitialL3():
             largestDistance = abs(p - 0.5)
             bestInitialState = i
 
-    print(largestDistance)
     return(bestInitialState)
+
+# Determine initial states for each shift register
+# with greatest deviation between p* and 0.5
 
 l1 = findInitialL1()
 l2 = findInitialL2()
 l3 = findInitialL3()
 
+# Produce streams for each shift register based 
+# on calculated initial states
+
 l1stream = L1(l1, 193)
 l2stream = L2(l2, 193)
 l3stream = L3(l3, 193)
+
+# Combine streams from shift registers together 
+# to generate a keystream
 
 stream = ""
 
@@ -166,9 +165,16 @@ for i in range(len(l1stream)):
         stream = stream + "1"
     else:
         stream = stream + "0"
+
+# Check if generated keystream equals actual keystream
     
 if keystreamText == stream:
-    print("hooray")
+    print("Correct keystream successfully generated.")
+    print("Initial state for L1 is ", l1)
+    print("Initial state for L2 is ", l2)
+    print("Initial state for L3 is ", l2)
+else:
+    print("Incorrect keystream generated.")
 
 
 # Exercise 2
