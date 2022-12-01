@@ -172,7 +172,7 @@ if keystreamText == stream:
     print("Correct keystream successfully generated.")
     print("Initial state for L1 is ", l1)
     print("Initial state for L2 is ", l2)
-    print("Initial state for L3 is ", l2)
+    print("Initial state for L3 is ", l3)
 else:
     print("Incorrect keystream generated.")
 
