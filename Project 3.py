@@ -1,5 +1,6 @@
 from scipy.spatial.distance import hamming
 import itertools
+import matplotlib.pyplot as plt
 
 # Implement the three polynomials as shift registers
 
@@ -37,20 +38,33 @@ def L1(state, streamLength):
 
 def findInitialL1():
     largestDistance = 0
+    bestPValue = 0
     bestInitialState = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     initialStates = list(itertools.product([0, 1], repeat=13))
     initialStates = initialStates[1:]
 
+    pvalues = []
+    xvalues = list(range(len(initialStates)))
+
     for i in initialStates:
         sequence = L1(i, 193)
         ham = hamming(keystream, sequence)
         p = 1 - ham
+        pvalues.append(p)
         if abs(p - 0.5) > largestDistance:
             largestDistance = abs(p - 0.5)
+            bestPValue = p
             bestInitialState = i
 
-    return(bestInitialState)
+    plt.scatter(xvalues, pvalues)
+    plt.title("Initial States generating p* values for LFSR 1")
+    plt.xlabel("Initial States")
+    plt.ylabel("p* Values")
+    plt.xticks(color='w')
+    plt.show()
+
+    return(bestInitialState, bestPValue)
 
 # Register L2:
 
@@ -80,20 +94,33 @@ def L2(state, streamLength):
 
 def findInitialL2():
     largestDistance = 0
+    bestPValue = 0
     bestInitialState = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     initialStates = list(itertools.product([0, 1], repeat=15))
     initialStates = initialStates[1:]
 
+    pvalues = []
+    xvalues = list(range(len(initialStates)))
+
     for i in initialStates:
         sequence = L2(i, 193)
         ham = hamming(keystream, sequence)
         p = 1 - ham
+        pvalues.append(p)
         if abs(p - 0.5) > largestDistance:
             largestDistance = abs(p - 0.5)
+            bestPValue = p
             bestInitialState = i
+    
+    plt.scatter(xvalues, pvalues)
+    plt.title("Initial States generating p* values for LFSR 2")
+    plt.xlabel("Initial States")
+    plt.ylabel("p* Values")
+    plt.xticks(color='w')
+    plt.show()
 
-    return(bestInitialState)
+    return(bestInitialState, bestPValue)
 
 # Register L3:
 
@@ -126,26 +153,47 @@ def L3(state, streamLength):
 def findInitialL3():
     largestDistance = 0
     bestInitialState = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    bestPValue = 0
 
     initialStates = list(itertools.product([0, 1], repeat=17))
     initialStates = initialStates[1:]
+
+    pvalues = []
+    xvalues = list(range(len(initialStates)))
 
     for i in initialStates:
         sequence = L3(i, 193)
         ham = hamming(keystream, sequence)
         p = 1 - ham
+        pvalues.append(p)
         if abs(p - 0.5) > largestDistance:
             largestDistance = abs(p - 0.5)
+            bestPValue = p
             bestInitialState = i
+    
+        
+    plt.scatter(xvalues, pvalues)
+    plt.title("Initial States generating p* values for LFSR 3")
+    plt.xlabel("Initial States")
+    plt.ylabel("p* Values")
+    plt.xticks(color='w')
+    plt.show()
 
-    return(bestInitialState)
+    return(bestInitialState, bestPValue)
 
-# Determine initial states for each shift register
+# Determine initial states and p values for each shift register
 # with greatest deviation between p* and 0.5
 
-l1 = findInitialL1()
-l2 = findInitialL2()
-l3 = findInitialL3()
+output1 = findInitialL1()
+output2 = findInitialL2()
+output3 = findInitialL3()
+
+# Assign initial states for each shift register
+# with greatest deviation between p* and 0.5
+
+l1 = output1[0]
+l2 = output2[0]
+l3 = output3[0]
 
 # Produce streams for each shift register based 
 # on calculated initial states
@@ -171,22 +219,10 @@ for i in range(len(l1stream)):
 if keystreamText == stream:
     print("Correct keystream successfully generated.")
     print("Initial state for L1 is ", l1)
+    print("Corresponding best probability p for L1 is ", output1[1])
     print("Initial state for L2 is ", l2)
+    print("Corresponding best probability p for L2 is ", output2[1])
     print("Initial state for L3 is ", l3)
+    print("Corresponding best probability p for L3 is ", output3[1])
 else:
     print("Incorrect keystream generated.")
-
-
-# Exercise 2
-
-# 2^13 - 1 combinations for first key.
-# 2^15 - 1 combinations for second key.
-# 2^17 - 1 combinations for third key.
-
-# In the above correlation attack we produce all the initial states once, and then compare them
-# in time linear to that of the length of the stream. The dominant time comes from producing 
-# all of the initial states once. 
-
-# To check the entire keyspace, we'd have to generate every initial state and then compare them
-# with each other. Assuming each attack takes T seconds, we'd have 8191 * 32767 * 131071 * T
-# which equals 35178735116287T attacks to do in the worst case. 
